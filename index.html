@@ -20,7 +20,7 @@
   --transition: 0.3s ease;
 }
 
-/* 🌙 Dark theme */
+
 body[data-theme="dark"] {
   --bg: #020617;
   --card: #0f172a;
@@ -115,8 +115,15 @@ input:focus {
 
 .vector-row {
   display: flex;
-  gap: 10px;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.vector-label {
+  min-width: 60px;
+  font-weight: 600;
 }
 
 button {
@@ -207,7 +214,7 @@ const stepsEl = document.getElementById("steps");
 const numVectors = document.getElementById("numVectors");
 const vectorSize = document.getElementById("vectorSize");
 
-/* 🌙 Dark mode */
+
 const toggle = document.getElementById("themeToggle");
 toggle.onclick = () => {
   const dark = document.body.getAttribute("data-theme") === "dark";
@@ -215,7 +222,7 @@ toggle.onclick = () => {
   toggle.textContent = dark ? "🌙 Dark" : "☀️ Light";
 };
 
-/* Clamp values between 1–7 */
+
 function clamp(input) {
   let v = Number(input.value);
   if (v < 1) v = 1;
@@ -223,21 +230,32 @@ function clamp(input) {
   input.value = v;
 }
 
-/* Render vector inputs */
+
 function renderVectors() {
   clamp(numVectors);
   clamp(vectorSize);
-
   vectorsEl.innerHTML = "";
+
   for (let i = 0; i < numVectors.value; i++) {
     const row = document.createElement("div");
     row.className = "vector-row";
+
+    const label = document.createElement("span");
+    label.className = "vector-label";
+    label.textContent = `v${i + 1} = (`;
+    row.appendChild(label);
+
     for (let j = 0; j < vectorSize.value; j++) {
       const input = document.createElement("input");
       input.type = "number";
-      input.placeholder = `v${i+1}${j+1}`;
       row.appendChild(input);
     }
+
+    const close = document.createElement("span");
+    close.textContent = ")";
+    close.style.fontWeight = "600";
+    row.appendChild(close);
+
     vectorsEl.appendChild(row);
   }
 }
@@ -246,7 +264,7 @@ numVectors.addEventListener("input", renderVectors);
 vectorSize.addEventListener("input", renderVectors);
 renderVectors();
 
-/* 🎬 Gram–Schmidt animation */
+
 document.getElementById("compute").onclick = () => {
   stepsEl.innerHTML = "";
   let delay = 0;
