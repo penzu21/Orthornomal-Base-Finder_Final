@@ -20,7 +20,6 @@
   --transition: 0.3s ease;
 }
 
-
 body[data-theme="dark"] {
   --bg: #020617;
   --card: #0f172a;
@@ -36,9 +35,7 @@ body {
   font-family: 'Inter', system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
-  transition: var(--transition);
   padding: 40px 16px;
-  min-height: 100vh;
 }
 
 .app {
@@ -48,12 +45,6 @@ body {
   border-radius: var(--radius);
   padding: 32px;
   box-shadow: 0 20px 40px rgba(0,0,0,.15);
-  animation: fadeIn 0.6s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 header {
@@ -62,29 +53,20 @@ header {
   align-items: center;
 }
 
-h1 {
-  font-size: 1.9rem;
-  margin: 0;
-}
+h1 { margin: 0; }
 
 .subtitle {
   color: var(--muted);
   font-size: .95rem;
-  margin-top: 6px;
 }
 
 .toggle {
-  cursor: pointer;
   border: none;
   background: var(--accent);
-  color: var(--text);
   padding: 8px 14px;
   border-radius: 999px;
-  font-weight: 500;
-  transition: var(--transition);
+  cursor: pointer;
 }
-
-.toggle:hover { opacity: .85; }
 
 .controls {
   display: grid;
@@ -95,8 +77,8 @@ h1 {
 
 label {
   font-size: .85rem;
-  margin-bottom: 6px;
   display: block;
+  margin-bottom: 6px;
 }
 
 input {
@@ -108,46 +90,25 @@ input {
   color: var(--text);
 }
 
-input:focus {
-  outline: none;
-  border-color: var(--primary);
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
 }
 
-.vector-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
-  flex-wrap: wrap;
+th, td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid var(--accent);
 }
 
-.vector-label {
-  min-width: 60px;
+th {
+  background: var(--accent);
   font-weight: 600;
 }
 
-button {
-  border: none;
-  padding: 10px 16px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: var(--transition);
-}
-
-.primary {
-  background: var(--primary);
-  color: white;
-}
-
-.primary:hover {
-  background: var(--primary-hover);
-  transform: translateY(-1px);
-}
-
-.secondary {
-  background: var(--accent);
-  color: var(--text);
+.vector-label {
+  font-weight: 600;
 }
 
 .actions {
@@ -156,56 +117,64 @@ button {
   margin-top: 20px;
 }
 
+button {
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.primary {
+  background: var(--primary);
+  color: white;
+}
+
+.secondary {
+  background: var(--accent);
+}
+
 .step {
   background: var(--accent);
   padding: 14px;
   border-radius: 10px;
   margin-top: 12px;
-  opacity: 0;
-  transform: translateY(8px);
-  animation: stepIn 0.4s ease forwards;
-}
-
-@keyframes stepIn {
-  to { opacity: 1; transform: translateY(0); }
 }
 
 .math {
   font-family: monospace;
-  font-size: .9rem;
 }
 </style>
 </head>
 
 <body data-theme="light">
 <main class="app">
-  <header>
-    <div>
-      <h1>Orthonormal Basis Finder</h1>
-      <p class="subtitle">Visual Gram–Schmidt Process</p>
-    </div>
-    <button class="toggle" id="themeToggle">🌙 Dark</button>
-  </header>
-
-  <section class="controls">
-    <div>
-      <label>Number of Vectors (1–7)</label>
-      <input type="number" id="numVectors" min="1" max="7" value="3">
-    </div>
-    <div>
-      <label>Vector Dimension (1–7)</label>
-      <input type="number" id="vectorSize" min="1" max="7" value="3">
-    </div>
-  </section>
-
-  <section id="vectors"></section>
-
-  <div class="actions">
-    <button class="primary" id="compute">Animate Gram–Schmidt</button>
-    <button class="secondary" onclick="location.reload()">Reset</button>
+<header>
+  <div>
+    <h1>Orthonormal Basis Finder</h1>
+    <p class="subtitle">Visual Gram–Schmidt Process</p>
   </div>
+  <button class="toggle" id="themeToggle">🌙 Dark</button>
+</header>
 
-  <section id="steps"></section>
+<section class="controls">
+  <div>
+    <label>Number of Vectors (1–7)</label>
+    <input type="number" id="numVectors" min="1" max="7" value="3">
+  </div>
+  <div>
+    <label>Vector Dimension (1–7)</label>
+    <input type="number" id="vectorSize" min="1" max="7" value="3">
+  </div>
+</section>
+
+<section id="vectors"></section>
+
+<div class="actions">
+  <button class="primary" id="compute">Animate Gram–Schmidt</button>
+  <button class="secondary" onclick="location.reload()">Reset</button>
+</div>
+
+<section id="steps"></section>
 </main>
 
 <script>
@@ -214,62 +183,55 @@ const stepsEl = document.getElementById("steps");
 const numVectors = document.getElementById("numVectors");
 const vectorSize = document.getElementById("vectorSize");
 
-
-const toggle = document.getElementById("themeToggle");
-toggle.onclick = () => {
-  const dark = document.body.getAttribute("data-theme") === "dark";
-  document.body.setAttribute("data-theme", dark ? "light" : "dark");
-  toggle.textContent = dark ? "🌙 Dark" : "☀️ Light";
+/* Dark mode */
+document.getElementById("themeToggle").onclick = () => {
+  const dark = document.body.dataset.theme === "dark";
+  document.body.dataset.theme = dark ? "light" : "dark";
 };
 
-
-function clamp(input) {
-  let v = Number(input.value);
-  if (v < 1) v = 1;
-  if (v > 7) v = 7;
-  input.value = v;
-}
-
-
-function renderVectors() {
-  clamp(numVectors);
-  clamp(vectorSize);
+/* Render vector table */
+function renderTable() {
   vectorsEl.innerHTML = "";
 
+  const table = document.createElement("table");
+  const thead = document.createElement("thead");
+  const headRow = document.createElement("tr");
+
+  headRow.innerHTML = `<th>Vector</th>`;
+  for (let j = 0; j < vectorSize.value; j++) {
+    headRow.innerHTML += `<th>x<sub>${j + 1}</sub></th>`;
+  }
+
+  thead.appendChild(headRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+
   for (let i = 0; i < numVectors.value; i++) {
-    const row = document.createElement("div");
-    row.className = "vector-row";
+    const row = document.createElement("tr");
 
-    const label = document.createElement("span");
-    label.className = "vector-label";
-    label.textContent = `v${i + 1} = (`;
-    row.appendChild(label);
-
+    row.innerHTML = `<td class="vector-label">v<sub>${i + 1}</sub></td>`;
     for (let j = 0; j < vectorSize.value; j++) {
-      const input = document.createElement("input");
-      input.type = "number";
-      row.appendChild(input);
+      row.innerHTML += `<td><input type="number"></td>`;
     }
 
-    const close = document.createElement("span");
-    close.textContent = ")";
-    close.style.fontWeight = "600";
-    row.appendChild(close);
-
-    vectorsEl.appendChild(row);
+    tbody.appendChild(row);
   }
+
+  table.appendChild(tbody);
+  vectorsEl.appendChild(table);
 }
 
-numVectors.addEventListener("input", renderVectors);
-vectorSize.addEventListener("input", renderVectors);
-renderVectors();
+numVectors.addEventListener("input", renderTable);
+vectorSize.addEventListener("input", renderTable);
+renderTable();
 
-
+/* Animate steps */
 document.getElementById("compute").onclick = () => {
   stepsEl.innerHTML = "";
   let delay = 0;
 
-  [...vectorsEl.children].forEach((_, i) => {
+  for (let i = 0; i < numVectors.value; i++) {
     setTimeout(() => {
       const step = document.createElement("div");
       step.className = "step";
@@ -281,18 +243,7 @@ document.getElementById("compute").onclick = () => {
       stepsEl.appendChild(step);
     }, delay);
     delay += 600;
-  });
-
-  setTimeout(() => {
-    const step = document.createElement("div");
-    step.className = "step";
-    step.innerHTML = `
-      <strong>Normalization</strong>
-      <div class="math">
-        e<sub>i</sub> = u<sub>i</sub> / ||u<sub>i</sub>||
-      </div>`;
-    stepsEl.appendChild(step);
-  }, delay + 300);
+  }
 };
 </script>
 </body>
