@@ -13,7 +13,7 @@
   --card: #ffffff;
   --text: #0f172a;
   --muted: #64748b;
-  --primary: #6366f1;
+  --primary: #6366f1; /* Blue accent for title */
   --primary-hover: #4f46e5;
   --accent: #eef2ff;
   --radius: 14px;
@@ -49,15 +49,30 @@ body {
 
 header {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
+  gap: 6px;
+  margin-bottom: 20px;
 }
 
-h1 { margin: 0; }
+h1 {
+  margin: 0;
+  color: var(--primary);
+  font-size: 2rem;
+  text-align: center;
+}
 
 .subtitle {
   color: var(--muted);
-  font-size: .95rem;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.description {
+  color: var(--text);
+  font-size: 0.95rem;
+  text-align: center;
+  max-width: 700px;
 }
 
 .toggle {
@@ -66,6 +81,7 @@ h1 { margin: 0; }
   padding: 8px 14px;
   border-radius: 999px;
   cursor: pointer;
+  margin-top: 10px;
 }
 
 .controls {
@@ -129,8 +145,13 @@ button {
   color: white;
 }
 
+.primary:hover {
+  background: var(--primary-hover);
+}
+
 .secondary {
   background: var(--accent);
+  color: var(--text);
 }
 
 .step {
@@ -152,6 +173,9 @@ button {
   <div>
     <h1>Orthonormal Basis Finder</h1>
     <p class="subtitle">Visual Gram–Schmidt Process</p>
+    <p class="description">
+      Enter a set of vectors and their dimensions below, then visualize the Gram–Schmidt process to generate an orthonormal basis. Ideal for learning linear algebra and understanding vector projections.
+    </p>
   </div>
   <button class="toggle" id="themeToggle">🌙 Dark</button>
 </header>
@@ -183,13 +207,14 @@ const stepsEl = document.getElementById("steps");
 const numVectors = document.getElementById("numVectors");
 const vectorSize = document.getElementById("vectorSize");
 
-/* Dark mode */
+/* Dark mode toggle */
 document.getElementById("themeToggle").onclick = () => {
   const dark = document.body.dataset.theme === "dark";
   document.body.dataset.theme = dark ? "light" : "dark";
+  document.getElementById("themeToggle").textContent = dark ? "🌙 Dark" : "☀️ Light";
 };
 
-/* Render vector table */
+/* Render vector table with subscripts */
 function renderTable() {
   vectorsEl.innerHTML = "";
 
@@ -201,7 +226,6 @@ function renderTable() {
   for (let j = 0; j < vectorSize.value; j++) {
     headRow.innerHTML += `<th>x<sub>${j + 1}</sub></th>`;
   }
-
   thead.appendChild(headRow);
   table.appendChild(thead);
 
@@ -209,12 +233,10 @@ function renderTable() {
 
   for (let i = 0; i < numVectors.value; i++) {
     const row = document.createElement("tr");
-
     row.innerHTML = `<td class="vector-label">v<sub>${i + 1}</sub></td>`;
     for (let j = 0; j < vectorSize.value; j++) {
       row.innerHTML += `<td><input type="number"></td>`;
     }
-
     tbody.appendChild(row);
   }
 
@@ -226,7 +248,7 @@ numVectors.addEventListener("input", renderTable);
 vectorSize.addEventListener("input", renderTable);
 renderTable();
 
-/* Animate steps */
+/* Animate Gram–Schmidt steps */
 document.getElementById("compute").onclick = () => {
   stepsEl.innerHTML = "";
   let delay = 0;
@@ -244,6 +266,17 @@ document.getElementById("compute").onclick = () => {
     }, delay);
     delay += 600;
   }
+
+  setTimeout(() => {
+    const step = document.createElement("div");
+    step.className = "step";
+    step.innerHTML = `
+      <strong>Normalization</strong>
+      <div class="math">
+        e<sub>i</sub> = u<sub>i</sub> / ||u<sub>i</sub>||
+      </div>`;
+    stepsEl.appendChild(step);
+  }, delay + 300);
 };
 </script>
 </body>
