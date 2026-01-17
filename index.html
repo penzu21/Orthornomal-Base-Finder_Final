@@ -16,13 +16,12 @@
   --primary: #6366f1;
   --primary-hover: #4f46e5;
   --accent: #eef2ff;
-  --danger: #ef4444;
   --radius: 14px;
   --transition: 0.3s ease;
 }
 
-
-[data-theme="dark"] {
+/* 🌙 Dark theme */
+body[data-theme="dark"] {
   --bg: #020617;
   --card: #0f172a;
   --text: #e5e7eb;
@@ -39,6 +38,7 @@ body {
   color: var(--text);
   transition: var(--transition);
   padding: 40px 16px;
+  min-height: 100vh;
 }
 
 .app {
@@ -73,7 +73,6 @@ h1 {
   margin-top: 6px;
 }
 
-
 .toggle {
   cursor: pointer;
   border: none;
@@ -100,7 +99,7 @@ label {
   display: block;
 }
 
-select, input {
+input {
   width: 100%;
   padding: 10px;
   border-radius: 8px;
@@ -109,7 +108,7 @@ select, input {
   color: var(--text);
 }
 
-input:focus, select:focus {
+input:focus {
   outline: none;
   border-color: var(--primary);
 }
@@ -171,8 +170,8 @@ button {
 </style>
 </head>
 
-<body>
-<main class="app" id="app">
+<body data-theme="light">
+<main class="app">
   <header>
     <div>
       <h1>Orthonormal Basis Finder</h1>
@@ -183,18 +182,12 @@ button {
 
   <section class="controls">
     <div>
-      <label>Vectors</label>
-      <select id="numVectors">
-        <option value="2">2</option>
-        <option value="3" selected>3</option>
-      </select>
+      <label>Number of Vectors (1–7)</label>
+      <input type="number" id="numVectors" min="1" max="7" value="3">
     </div>
     <div>
-      <label>Dimension</label>
-      <select id="vectorSize">
-        <option value="2">2</option>
-        <option value="3" selected>3</option>
-      </select>
+      <label>Vector Dimension (1–7)</label>
+      <input type="number" id="vectorSize" min="1" max="7" value="3">
     </div>
   </section>
 
@@ -214,17 +207,27 @@ const stepsEl = document.getElementById("steps");
 const numVectors = document.getElementById("numVectors");
 const vectorSize = document.getElementById("vectorSize");
 
-
+/* 🌙 Dark mode */
 const toggle = document.getElementById("themeToggle");
 toggle.onclick = () => {
-  const app = document.documentElement;
-  const dark = app.getAttribute("data-theme") === "dark";
-  app.setAttribute("data-theme", dark ? "light" : "dark");
+  const dark = document.body.getAttribute("data-theme") === "dark";
+  document.body.setAttribute("data-theme", dark ? "light" : "dark");
   toggle.textContent = dark ? "🌙 Dark" : "☀️ Light";
 };
 
+/* Clamp values between 1–7 */
+function clamp(input) {
+  let v = Number(input.value);
+  if (v < 1) v = 1;
+  if (v > 7) v = 7;
+  input.value = v;
+}
 
-function render() {
+/* Render vector inputs */
+function renderVectors() {
+  clamp(numVectors);
+  clamp(vectorSize);
+
   vectorsEl.innerHTML = "";
   for (let i = 0; i < numVectors.value; i++) {
     const row = document.createElement("div");
@@ -238,22 +241,24 @@ function render() {
     vectorsEl.appendChild(row);
   }
 }
-numVectors.onchange = vectorSize.onchange = render;
-render();
 
+numVectors.addEventListener("input", renderVectors);
+vectorSize.addEventListener("input", renderVectors);
+renderVectors();
 
+/* 🎬 Gram–Schmidt animation */
 document.getElementById("compute").onclick = () => {
   stepsEl.innerHTML = "";
   let delay = 0;
 
-  [...vectorsEl.children].forEach((row, i) => {
+  [...vectorsEl.children].forEach((_, i) => {
     setTimeout(() => {
       const step = document.createElement("div");
       step.className = "step";
       step.innerHTML = `
-        <strong>Step ${i+1}</strong>
+        <strong>Step ${i + 1}</strong>
         <div class="math">
-          u<sub>${i+1}</sub> = v<sub>${i+1}</sub> − projections onto previous vectors
+          u<sub>${i + 1}</sub> = v<sub>${i + 1}</sub> − Σ proj<sub>u<sub>k</sub></sub>(v<sub>${i + 1}</sub>)
         </div>`;
       stepsEl.appendChild(step);
     }, delay);
@@ -269,7 +274,7 @@ document.getElementById("compute").onclick = () => {
         e<sub>i</sub> = u<sub>i</sub> / ||u<sub>i</sub>||
       </div>`;
     stepsEl.appendChild(step);
-  }, delay + 400);
+  }, delay + 300);
 };
 </script>
 </body>
